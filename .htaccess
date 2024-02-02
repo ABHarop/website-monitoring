@@ -1,0 +1,24 @@
+RewriteEngine On
+
+# Remove file extension and add a trailing slash
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^([^\.]+)/?$ $1.php [NC,L]
+
+# Handling errors
+ErrorDocument 400  https://sites.pahappa.net
+ErrorDocument 401  https://sites.pahappa.net
+ErrorDocument 403  https://sites.pahappa.net
+ErrorDocument 404  https://sites.pahappa.net/404
+ErrorDocument 500  https://sites.pahappa.net
+ErrorDocument 502  https://sites.pahappa.net
+ErrorDocument 504  https://sites.pahappa.net
+
+# Protecting Sensitive Files and Directories
+<FilesMatch "(config\.php|\.htaccess)">
+    Order deny,allow
+    Deny from all
+</FilesMatch>
+
+# Disable Directory Listing
+Options -Indexes

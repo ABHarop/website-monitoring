@@ -1,0 +1,124 @@
+/* Preloader */
+
+#preloader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  overflow: hidden;
+  background: #fff; 
+}
+
+#preloader:before {
+  content: "";
+  position: fixed;
+  top: calc(50% - 30px);
+  left: calc(50% - 30px);
+  border: 6px solid #1f56a7;
+  border-top-color: #d1e6f9;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  -webkit-animation: animate-preloader 1s linear infinite;
+  animation: animate-preloader 1s linear infinite;
+}
+
+#preloader2 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  overflow: hidden;
+  background: #ffffff82;
+}
+
+#preloader2:before {
+  content: "";
+  position: fixed;
+  top: calc(50% - 30px);
+  left: calc(50% - 30px);
+  border: 6px solid #000;
+  border-top-color: #d1e6f9;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  -webkit-animation: animate-preloader 1s linear infinite;
+  animation: animate-preloader 1s linear infinite;
+}
+
+@-webkit-keyframes animate-preloader {
+  0% {
+      transform: rotate(0deg);
+  }
+  100% {
+      transform: rotate(360deg);
+  }
+}
+
+@keyframes animate-preloader {
+  0% {
+      transform: rotate(0deg);
+  }
+  100% {
+      transform: rotate(360deg);
+  }
+}
+
+.rows {
+  margin: 8px -16px;
+}
+
+/* Add padding BETWEEN each column */
+
+.rows,
+.rows > .columns {
+  padding: 6px;
+}
+
+/* Create four equal columns that floats next to each other */
+
+.columns {
+  float: left;
+  width: 25%;
+}
+
+/* Clear floats after rows */
+
+.rows:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Contents */
+
+.contents {
+  background-color: white;
+  padding: 8px;
+}
+
+/* Responsive layout - makes a two column-layout instead of four columns */
+
+@media screen and (max-width: 900px) {
+  .columns {
+    width: 50%;
+  }
+}
+
+/* Responsive layout - makes the two columns stack on top of each other instead of next to each other */
+
+@media screen and (max-width: 600px) {
+  .columns {
+    width: 50%;
+  }
+}
+
+@media screen and (max-width: 300px) {
+  .columns {
+    width: 50%;
+  }
+}
