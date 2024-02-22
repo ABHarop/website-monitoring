@@ -8,13 +8,14 @@
 		$website = $_POST['website'];
     $slug = slugify($website);
 		$link = $_POST['link'];
+    $dateexpire = $_POST['dateexpire'];
     $now = date('Y-m-d');
 
     try{
       // insert in the category table
-      $stmt = $conn->prepare("INSERT INTO websitetb (website, slug, link, createdon) VALUES (:website, :slug, :link, :createdon)");
+      $stmt = $conn->prepare("INSERT INTO websitetb (website, slug, link, dateexpire, createdon) VALUES (:website, :slug, :link, :dateexpire, :createdon)");
 
-      $stmt->execute(['website'=>$website, 'slug'=>$slug, 'link'=>$link, 'createdon'=>$now]);
+      $stmt->execute(['website'=>$website, 'slug'=>$slug, 'link'=>$link, 'dateexpire'=>$dateexpire, 'createdon'=>$now]);
       $_SESSION['success'] = 'Website Added Successfully';
 
     }
@@ -29,12 +30,13 @@
     $id = $_POST['id'];
     $website = $_POST['website'];
     $link = $_POST['link'];
+    $dateexpire = $_POST['dateexpire'];
     $status = $_POST['status'];
 
     try{
-      $stmt = $conn->prepare("UPDATE websitetb SET website=:website, link=:link, status=:status WHERE id=:id");
+      $stmt = $conn->prepare("UPDATE websitetb SET website=:website, link=:link, status=:status, dateexpire=:dateexpire WHERE id=:id");
       
-      $stmt->execute(['website'=>$website,'link'=>$link, 'status'=>$status, 'id'=>$id]);
+      $stmt->execute(['website'=>$website,'link'=>$link, 'status'=>$status, 'dateexpire'=>$dateexpire, 'id'=>$id]);
       $_SESSION['success'] = 'Website Info Successfully Updated';
       
     }
@@ -82,7 +84,8 @@
                       <th style="width:4%">No.</th>
                       <th style="width:20%">Website</th>
                       <th style="width:34%">URL</th>
-                      <th>Domain Status</th>
+                      <th>Domain</th>
+                      <th>Expiry</th>
                       <th>Online</th>
                       <th>Action</th>
                     </thead>
@@ -96,12 +99,14 @@
                           foreach($stmt as $row){
                             $status = ($row['status'] == 1 ) ? '<span class="label label-success">Running</span>' : '<span class="label label-danger">Expired</span>';
                             $onlinestatus = ($row['online'] == 1 ) ? '<span class="label label-success fa fa-check-circle"><i></i></span>' : '<span class="label label-danger fa fa-close"><i></i></span>';
+                            $siteExpiryDate = $row['dateexpire'] == '0000-00-00' ? 'Not Set' : date('M d, Y', strtotime($row['dateexpire']));
                             echo "
                               <tr>
                                 <td>".$siteCount."</td>
                                 <td>".$row['website']."</td>
                                 <td>".$row['link']."</td>
                                 <td>".$row['status']."</td>
+                                <td>".$siteExpiryDate."</td>
                                 <td>".$onlinestatus."</td>
                                 <td>
                                   <button class='btn btn-success btn-sm edit btn-flat' data-id='".$row['wid']."'><i class='fa fa-edit'></i> Edit</button>
@@ -143,13 +148,17 @@
       <div class="modal-body" style="margin-top:-20px">
         <form class="form-horizontal" method="POST" enctype="multipart/form-data">
           <div class="form-group">
-            <div class="col-sm-6">
+            <div class="col-sm-12">
               <span>Website</span>
               <input type="text" class="input-fund" id="website" name="website" palceholder="Website Name"  required>
             </div>
             <div class="col-sm-6">
               <span>URL</span>
               <input type="text" class="input-fund" id="link" name="link" palceholder="Website URL" required>
+            </div>
+            <div class="col-sm-6">
+              <span>Expiry Date</span>
+              <input type="text" class="input-fund" id="addexdate" name="dateexpire" palceholder="Choose Expiry Date"  required>
             </div>
           </div>          
       </div>
@@ -183,7 +192,7 @@
                 <span>URL</span>
                 <input type="text" class="input-fund" name="link" id="linkid" required/>
               </div>
-              <div class="col-sm-12">
+              <div class="col-sm-6">
                 <span>Domain Status</span>
                 <select class="input-fund" name="status">
                   <option selected id="statusselected"></option>
@@ -200,6 +209,10 @@
                     $pdo->close();
                   ?>
                 </select>
+              </div>
+              <div class="col-sm-6">
+                <span>Expiry Date</span>
+                <input type="text" class="input-fund" name="dateexpire" id="expirydate" required/>
               </div>
           </div>
         <div class="modal-footer">
@@ -232,6 +245,7 @@
         $('#statusselected').val(response.wstatus).html(response.status);
         $('#websiteid').val(response.website);
         $('#linkid').val(response.link);
+        $('#expirydate').val(response.dateexpire);
       }
     });
   }
@@ -239,6 +253,38 @@
   setInterval(function() {
     $('#refresh-table').load(location.href + ' #refresh-table');
   }, 3000);
+
+  var currentDate = new Date();
+  $('#addexdate').datepicker({
+    dateFormat: 'yy-mm-dd',
+    autoclose: true,
+    minDate: currentDate,
+    maxDate: '+24m',
+  }).on('changeDate', function(ev) {
+    $(this).datepicker('hide');
+  });
+
+  $('#addexdate').keyup(function() {
+    if (this.value.match(/[^0-9]/g)) {
+      this.value = this.value.replace(/[^0-9^-]/g, '');
+    }
+  });
+
+  $('#expirydate').datepicker({
+    dateFormat: 'yy-mm-dd',
+    autoclose: true,
+    minDate: currentDate,
+    maxDate: '+24m',
+  }).on('changeDate', function(ev) {
+    $(this).datepicker('hide');
+  });
+
+  $('#expirydate').keyup(function() {
+    if (this.value.match(/[^0-9]/g)) {
+      this.value = this.value.replace(/[^0-9^-]/g, '');
+    }
+  });
+
 </script>
 </body>
 </html>

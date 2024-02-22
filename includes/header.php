@@ -15,11 +15,13 @@
   <link rel="stylesheet" href="./resource/css/font-awesome.min.css">
   <link rel="stylesheet" href="./resource/css/skins/_all-skins.min.css">
   <link rel="stylesheet" href="./resource/css/custom.css">
+  <link rel="stylesheet" href="./resource/jquery-ui/jquery-ui.min.css"> 
 
   <!-- JS Files -->
   <script type="text/javascript" src="./resource/js/jquery.min.js"></script>
   <script type="text/javascript" src="./resource/js/custom-jquery.js"></script> 
   <script type="text/javascript" src="./resource/js/jquery-ui.min.js"></script>
+  <script type="text/javascript" src="./resource/js/datepicker.js"></script> 
 
   <!-- Google Font -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">

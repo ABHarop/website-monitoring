@@ -18,8 +18,9 @@
                       <th style="width:4%">No.</th>
                       <th style="width:20%">Website</th>
                       <th style="width:34%">URL</th>
-                      <th>Domain Status</th>
-                      <th>Online</th>
+                      <th>Domain</th>
+                      <th>Expiry</th>
+                      <th>Online</th> 
                     </thead>
                     <tbody>
                       <?php
@@ -31,12 +32,14 @@
                           foreach($stmt as $row){
                             $status = ($row['status'] == 1 ) ? '<span class="label label-success">Running</span>' : '<span class="label label-danger">Expired</span>';
                             $onlinestatus = ($row['online'] == 1 ) ? '<span class="label label-success fa fa-check-circle"><i></i></span>' : '<span class="label label-danger fa fa-close"><i></i></span>';
+                            $siteExpiryDate = $row['dateexpire'] == '0000-00-00' ? 'Not Set' : date('M d, Y', strtotime($row['dateexpire']));
                             echo "
                               <tr>
                                 <td>".$siteCount."</td>
                                 <td>".$row['website']."</td>
-                                <td>".$row['link']."</td>
+                                <td><a target='_blank' href='".$row['link']."'>".$row['link']."</a></td>
                                 <td>".$row['wstatus']."</td>
+                                <td>".$siteExpiryDate."</td>
                                 <td>".$onlinestatus."</td>
                               </tr>
                             ";

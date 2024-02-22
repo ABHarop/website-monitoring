@@ -1,3 +1,6 @@
+# Adjust default time zone
+php_value date.timezone 'Africa/Kampala'
+
 RewriteEngine On
 
 # Remove file extension and add a trailing slash
