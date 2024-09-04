@@ -6,7 +6,7 @@
 		
 		$conn = $pdo->open();
 
-		$stmt = $conn->prepare("SELECT *, websitetb.id, statustb.id AS wstatus, statustb.status FROM websitetb JOIN statustb ON websitetb.status = statustb.id WHERE websitetb.id=:id");
+		$stmt = $conn->prepare("SELECT * FROM websitetb WHERE id=:id");
 		$stmt->execute(['id'=>$id]);
 		$row = $stmt->fetch();
 		

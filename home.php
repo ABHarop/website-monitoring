@@ -9,13 +9,13 @@
     $slug = slugify($website);
 		$link = $_POST['link'];
     $dateexpire = $_POST['dateexpire'];
-    $now = date('Y-m-d');
+    $today = date('Y-m-d');
 
     try{
-      // insert in the category table
+      // insert in the websitetb table
       $stmt = $conn->prepare("INSERT INTO websitetb (website, slug, link, dateexpire, createdon) VALUES (:website, :slug, :link, :dateexpire, :createdon)");
 
-      $stmt->execute(['website'=>$website, 'slug'=>$slug, 'link'=>$link, 'dateexpire'=>$dateexpire, 'createdon'=>$now]);
+      $stmt->execute(['website'=>$website, 'slug'=>$slug, 'link'=>$link, 'dateexpire'=>$dateexpire, 'createdon'=>$today]);
       $_SESSION['success'] = 'Website Added Successfully';
 
     }
@@ -31,12 +31,11 @@
     $website = $_POST['website'];
     $link = $_POST['link'];
     $dateexpire = $_POST['dateexpire'];
-    $status = $_POST['status'];
 
     try{
-      $stmt = $conn->prepare("UPDATE websitetb SET website=:website, link=:link, status=:status, dateexpire=:dateexpire WHERE id=:id");
+      $stmt = $conn->prepare("UPDATE websitetb SET website=:website, link=:link, dateexpire=:dateexpire WHERE id=:id");
       
-      $stmt->execute(['website'=>$website,'link'=>$link, 'status'=>$status, 'dateexpire'=>$dateexpire, 'id'=>$id]);
+      $stmt->execute(['website'=>$website,'link'=>$link, 'dateexpire'=>$dateexpire, 'id'=>$id]);
       $_SESSION['success'] = 'Website Info Successfully Updated';
       
     }
@@ -76,55 +75,63 @@
           <div class="col-xs-12">
             <div class="box">
               <div class="box-header with-border">
-                  <a href="#addnew" data-toggle="modal" class="btn btn-primary btn-sm btn-flat" style="background:#1f56a7"><i class="fa fa-plus"></i> New Website</a>
-                </div>
-                <div class="box-body table-responsive">
-                  <table id="refresh-table" class="table table-bordered table-condensed table-striped">
-                    <thead>
-                      <th style="width:4%">No.</th>
-                      <th style="width:20%">Website</th>
-                      <th style="width:34%">URL</th>
-                      <th>Domain</th>
-                      <th>Expiry</th>
-                      <th>Online</th>
-                      <th>Action</th>
-                    </thead>
-                    <tbody>
-                      <?php
-                        $conn = $pdo->open();
-                        try{
-                          $stmt = $conn->prepare("SELECT *, websitetb.id AS wid, statustb.status, websitetb.online FROM websitetb JOIN statustb ON websitetb.status = statustb.id JOIN onlinetb ON websitetb.online = onlinetb.id ORDER BY website ASC ");
-                          $stmt->execute();
-                          $siteCount = 1;
-                          foreach($stmt as $row){
-                            $status = ($row['status'] == 1 ) ? '<span class="label label-success">Running</span>' : '<span class="label label-danger">Expired</span>';
-                            $onlinestatus = ($row['online'] == 1 ) ? '<span class="label label-success fa fa-check-circle"><i></i></span>' : '<span class="label label-danger fa fa-close"><i></i></span>';
-                            $siteExpiryDate = $row['dateexpire'] == '0000-00-00' ? 'Not Set' : date('M d, Y', strtotime($row['dateexpire']));
-                            echo "
-                              <tr>
-                                <td>".$siteCount."</td>
-                                <td>".$row['website']."</td>
-                                <td>".$row['link']."</td>
-                                <td>".$row['status']."</td>
-                                <td>".$siteExpiryDate."</td>
-                                <td>".$onlinestatus."</td>
-                                <td>
-                                  <button class='btn btn-success btn-sm edit btn-flat' data-id='".$row['wid']."'><i class='fa fa-edit'></i> Edit</button>
-                                </td>
-                              </tr>
-                            ";
-                            $siteCount++;
-                          }
-                        }
-                        catch(PDOException $e){
-                          echo $e->getMessage();
-                        }
+                <a href="#addnew" data-toggle="modal" class="btn btn-primary btn-sm btn-flat" style="background:#1f56a7"><i class="fa fa-plus"></i> New Website</a>
+              </div>
+              <div class="box-body table-responsive">
+                <table id="refresh-table" class="table table-bordered table-condensed table-striped">
+                  <thead>
+                    <th style="width:4%">No.</th>
+                    <th style="width:20%">Website</th>
+                    <th style="width:34%">URL</th>
+                    <th>Active</th>
+                    <th>Expiry Date</th>
+                    <th>Online</th>
+                    <th>Action</th>
+                  </thead>
+                  <tbody>
+                    <?php
+                      $conn = $pdo->open();
+                      try{
+                        $stmt = $conn->prepare("SELECT * FROM websitetb ORDER BY website ASC ");
+                        $stmt->execute();
+                        $siteCount = 1;
+                        foreach($stmt as $row){
+                          $expiredStatus = ($row['active'] == 1 ) ? '<span class="label label-success fa fa-check-circle"><i></i></span>' : '<span class="label label-danger fa fa-close"><i></i></span>';
+                          $onlineStatus = ($row['status'] == 1 ) ? '<span class="label label-success fa fa-check-circle"><i></i></span>' : '<span class="label label-danger fa fa-close"><i></i></span>';
+                          $siteExpiryDate = $row['dateexpire'] == '0000-00-00' ? 'Not Set' : date('M d, Y', strtotime($row['dateexpire']));
 
-                        $pdo->close();
-                      ?>
-                    </tbody>
-                  </table>
-                </div>
+                          $link = $row['link'];
+
+                          // Check if the link starts with http:// or https://
+                          if (strpos($link, 'http://') !== 0 && strpos($link, 'https://') !== 0) {
+                              $sitelink = 'http://' . $link; // Add http:// if missing
+                          }
+
+                          echo "
+                            <tr>
+                              <td>{$siteCount}</td>
+                              <td>{$row['website']}</td>
+                              <td><a target='_blank' href='{$sitelink}'>{$link}</a></td>
+                              <td>{$expiredStatus}</td>
+                              <td>{$siteExpiryDate}</td>
+                              <td>{$onlineStatus}</td>
+                              <td>
+                                <button class='btn btn-success btn-sm edit btn-flat' data-id='".$row['id']."'><i class='fa fa-edit'></i> Edit</button>
+                              </td>
+                            </tr>
+                          ";
+                          $siteCount++;
+                        }
+                      }
+                      catch(PDOException $e){
+                        echo $e->getMessage();
+                      }
+
+                      $pdo->close();
+                    ?>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
@@ -184,31 +191,13 @@
           <form class="form-horizontal" method="POST" enctype="multipart/form-data">
             <input id="siteid" name="id" hidden>
             <div class="form-group">
-              <div class="col-sm-6">
+              <div class="col-sm-12">
                 <span>Website</span>
                 <input type="text" class="input-fund" name="website" id="websiteid" required/>
               </div>
               <div class="col-sm-6">
                 <span>URL</span>
                 <input type="text" class="input-fund" name="link" id="linkid" required/>
-              </div>
-              <div class="col-sm-6">
-                <span>Domain Status</span>
-                <select class="input-fund" name="status">
-                  <option selected id="statusselected"></option>
-                  <?php
-                    $conn = $pdo->open();
-
-                    $stmt = $conn->prepare("SELECT * FROM statustb ORDER BY status ASC");
-                    $stmt->execute();
-                    foreach($stmt as $srow){
-                      echo "
-                        <option value='".$srow['id']."' ></option>".$srow['status']."</option>
-                      ";
-                    }
-                    $pdo->close();
-                  ?>
-                </select>
               </div>
               <div class="col-sm-6">
                 <span>Expiry Date</span>
@@ -242,7 +231,6 @@
       dataType: 'json',
       success: function(response){
         $('#siteid').val(response.id);
-        $('#statusselected').val(response.wstatus).html(response.status);
         $('#websiteid').val(response.website);
         $('#linkid').val(response.link);
         $('#expirydate').val(response.dateexpire);

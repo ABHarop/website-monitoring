@@ -18,29 +18,38 @@
                       <th style="width:4%">No.</th>
                       <th style="width:20%">Website</th>
                       <th style="width:34%">URL</th>
-                      <th>Domain</th>
-                      <th>Expiry</th>
-                      <th>Online</th> 
+                      <th>Active</th>
+                      <th>Expiry Date</th>
+                      <th>Online</th>
                     </thead>
                     <tbody>
-                      <?php
+                    <?php
                         $conn = $pdo->open();
+                        $today = date('Y-m-d');
                         try{
-                          $stmt = $conn->prepare("SELECT *, websitetb.id, statustb.status AS wstatus FROM websitetb JOIN statustb ON websitetb.status = statustb.id ORDER BY website ASC");
+                          $stmt = $conn->prepare("SELECT * FROM websitetb WHERE dateexpire > '$today' ORDER BY website ASC ");
                           $stmt->execute();
                           $siteCount = 1;
                           foreach($stmt as $row){
-                            $status = ($row['status'] == 1 ) ? '<span class="label label-success">Running</span>' : '<span class="label label-danger">Expired</span>';
-                            $onlinestatus = ($row['online'] == 1 ) ? '<span class="label label-success fa fa-check-circle"><i></i></span>' : '<span class="label label-danger fa fa-close"><i></i></span>';
+                            $expiredStatus = ($row['active'] == 1 ) ? '<span class="label label-success fa fa-check-circle"><i></i></span>' : '<span class="label label-danger fa fa-close"><i></i></span>';
+                            $onlineStatus = ($row['status'] == 1 ) ? '<span class="label label-success fa fa-check-circle"><i></i></span>' : '<span class="label label-danger fa fa-close"><i></i></span>';
                             $siteExpiryDate = $row['dateexpire'] == '0000-00-00' ? 'Not Set' : date('M d, Y', strtotime($row['dateexpire']));
+
+                            $link = $row['link'];
+
+                            // Check if the link starts with http:// or https://
+                            if (strpos($link, 'http://') !== 0 && strpos($link, 'https://') !== 0) {
+                                $sitelink = 'http://' . $link; // Add http:// if it's missing
+                            }
+
                             echo "
                               <tr>
-                                <td>".$siteCount."</td>
-                                <td>".$row['website']."</td>
-                                <td><a target='_blank' href='".$row['link']."'>".$row['link']."</a></td>
-                                <td>".$row['wstatus']."</td>
-                                <td>".$siteExpiryDate."</td>
-                                <td>".$onlinestatus."</td>
+                                <td>{$siteCount}</td>
+                                <td>{$row['website']}</td>
+                                <td><a target='_blank' href='{$sitelink}'>{$link}</a></td>
+                                <td>{$expiredStatus}</td>
+                                <td>{$siteExpiryDate}</td>
+                                <td>{$onlineStatus}</td>
                               </tr>
                             ";
                             $siteCount++;
@@ -52,6 +61,7 @@
 
                         $pdo->close();
                       ?>
+
                     </tbody>
                   </table>
                 </div>

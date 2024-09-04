@@ -15,7 +15,14 @@
       <!-- Collect the nav links, forms, and other content for toggling -->
       <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
         <ul class="nav navbar-nav">
-          <li><a onclick="location.href='home'">PAHAPPA WEBSITE STATUS</a></li>
+          <li><a href="./home">HOME</a></li>
+          <?php
+            if(isset($_SESSION['user'])){
+              echo '
+                <li><a href="./recipient">RECIPIENTS</a></li>
+              ';
+            }
+          ?>
         </ul>
       </div>
       <!-- /.navbar-collapse -->
@@ -25,8 +32,6 @@
           <?php
               if(isset($_SESSION['user'])){
                 echo '
-                  <li><a href="./home">HOME</a></li>
-                  <li><a href="./recipient">RECIPIENTS</a></li>
                   <li><a href="./logout">LOGOUT</a></li>
                 ';
               }
